@@ -1,0 +1,56 @@
+{
+  "analysis_id": "84a8ccc4-9451-45b3-9e59-650a830c5002",
+  "source_file": "inline",
+  "title": "Checkout NPE",
+  "raw_input": "Checkout fails on empty cart\n\nError logs:\nERROR NullPointerException at CheckoutService.process\n\nStack trace:\nat com.shop.CheckoutService.process(CheckoutService.java:42)\nat com.shop.ApiController.checkout(ApiController.java:18)",
+  "triage": {
+    "priority": "medium",
+    "component": "unknown",
+    "summary": "Checkout fails on empty cart\n\nError logs:\nERROR NullPointerException at CheckoutService.process\n\nStack trace:\nat com.shop.CheckoutService.process(CheckoutService.java:42)\nat com.shop.ApiController.che...",
+    "tags": [],
+    "severity_score": 5,
+    "recommended_assignee_team": "unknown-team",
+    "business_impact": "Unknown system impact.",
+    "confidence": 0.7,
+    "reasoning": "Heuristics triggered: matched keyword patterns in content. Severity set to 5."
+  },
+  "log_analysis": {
+    "error_count": 2,
+    "error_samples": [
+      "Error",
+      "ERROR"
+    ],
+    "has_stack_trace": true,
+    "stack_trace_lines": [
+      "at com.shop.CheckoutService.process(CheckoutService.java:42)",
+      "at com.shop.ApiController.checkout(ApiController.java:18)"
+    ],
+    "timestamps_found": [],
+    "http_status_codes": [],
+    "log_format": "plain_text",
+    "detected_errors": [
+      "Error",
+      "ERROR"
+    ],
+    "warnings": [],
+    "exception_type": "NullPointerException",
+    "failure_point": "Line 42",
+    "affected_code_path": "CheckoutService.java",
+    "exceptions": [
+      "NullPointerException"
+    ],
+    "file_names": [
+      "CheckoutService.java",
+      "ApiController.java"
+    ],
+    "line_numbers": [
+      42,
+      18
+    ],
+    "confidence": 0.8
+  },
+  "processed_at": "2026-08-29T21:59:52.335300Z",
+  "pipeline_version": "milestone-2",
+  "overall_summary": "Priority: medium | Component: unknown | Errors: 2 | Stack trace: yes",
+  "overall_confidence": 0.75
+}

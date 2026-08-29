@@ -15,6 +15,24 @@ from app.utils.logger import get_logger
 
 logger = get_logger("services.store")
 
+
+def _parse_json(value, default=None):
+    if value is None:
+        return default
+    if isinstance(value, (dict, list)):
+        return value
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return default
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return default
+    return default
+
 @contextmanager
 def get_db_session():
     db = SessionLocal()
@@ -43,12 +61,13 @@ class SQLStore:
             raw_content=db_bug.raw_content,
             file_path=db_bug.file_path,
             file_name=db_bug.file_name,
-            status=BugStatus(db_bug.status),
+            status=_enum_or_default(BugStatus, db_bug.status, BugStatus.OPEN),
             metadata=BugMetadata(
                 bug_id=db_bug.id,
-                priority=BugPriority(db_bug.priority),
+                priority=_enum_or_default(BugPriority, db_bug.priority, BugPriority.MEDIUM),
                 component=db_bug.component,
                 resolution=db_bug.resolution or "",
+                root_cause=getattr(db_bug, "root_cause", None) or "",
                 source=db_bug.source,
                 date=db_bug.date,
                 tags=tags_list
@@ -75,6 +94,7 @@ class SQLStore:
             priority=bug.metadata.priority.value,
             component=bug.metadata.component,
             resolution=bug.metadata.resolution,
+            root_cause=bug.metadata.root_cause or "",
             source=bug.metadata.source,
             date=bug.metadata.date,
             tags=tags_str,
@@ -86,22 +106,22 @@ class SQLStore:
         return Analysis(
             id=db_analysis.id,
             bug_id=db_analysis.bug_id,
-            status=AnalysisStatus(db_analysis.status),
-            current_stage=WorkflowStage(db_analysis.current_stage),
-            triage=json.loads(db_analysis.triage) if db_analysis.triage else None,
-            log_analysis=json.loads(db_analysis.log_analysis) if db_analysis.log_analysis else None,
-            duplicate_detection=json.loads(db_analysis.duplicate_detection) if db_analysis.duplicate_detection else None,
-            root_cause=json.loads(db_analysis.root_cause) if db_analysis.root_cause else None,
-            remediation=json.loads(db_analysis.remediation) if db_analysis.remediation else None,
-            risk_assessment=json.loads(db_analysis.risk_assessment) if db_analysis.risk_assessment else None,
-            confidence_scoring=json.loads(db_analysis.confidence_scoring) if db_analysis.confidence_scoring else None,
-            executive_summary=json.loads(db_analysis.executive_summary) if db_analysis.executive_summary else None,
-            retrieved_context=json.loads(db_analysis.retrieved_context) if db_analysis.retrieved_context else [],
+            status=_enum_or_default(AnalysisStatus, db_analysis.status, AnalysisStatus.PENDING),
+            current_stage=_enum_or_default(WorkflowStage, db_analysis.current_stage, WorkflowStage.TRIAGE),
+            triage=_parse_json(db_analysis.triage),
+            log_analysis=_parse_json(db_analysis.log_analysis),
+            duplicate_detection=_parse_json(db_analysis.duplicate_detection),
+            root_cause=_parse_json(db_analysis.root_cause),
+            remediation=_parse_json(db_analysis.remediation),
+            risk_assessment=_parse_json(db_analysis.risk_assessment),
+            confidence_scoring=_parse_json(db_analysis.confidence_scoring),
+            executive_summary=_parse_json(db_analysis.executive_summary),
+            retrieved_context=_parse_json(db_analysis.retrieved_context, []),
             agent_results=[
                 AgentResult(
                     agent_name=r.agent_name,
-                    stage=WorkflowStage(r.stage),
-                    output=json.loads(r.output) if r.output else {},
+                    stage=_enum_or_default(WorkflowStage, r.stage, WorkflowStage.TRIAGE),
+                    output=_parse_json(r.output, {}),
                     confidence=r.confidence,
                     duration_ms=r.duration_ms
                 )
@@ -242,14 +262,51 @@ class SQLStore:
                     bug_id=e.bug_id,
                     analysis_id=e.analysis_id,
                     title=e.title,
-                    priority=BugPriority(e.priority),
+                    priority=_enum_or_default(BugPriority, e.priority, BugPriority.MEDIUM),
                     component=e.component,
-                    status=AnalysisStatus(e.status),
+                    status=_enum_or_default(AnalysisStatus, e.status, AnalysisStatus.PENDING),
                     summary=e.summary,
                     created_at=e.created_at
                 )
                 for e in db_entries
             ]
+
+    def delete_history(self, entry_id: str) -> bool:
+        with get_db_session() as db:
+            entry = db.query(DBHistoryEntry).filter(DBHistoryEntry.id == entry_id).first()
+            if not entry:
+                return False
+            db.delete(entry)
+            return True
+
+    def list_bugs(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+        search: str = "",
+        status: str = "",
+        category: str = "",
+    ) -> List[Bug]:
+        with get_db_session() as db:
+            query = db.query(DBBug)
+            if search:
+                like = f"%{search}%"
+                query = query.filter(
+                    (DBBug.title.ilike(like))
+                    | (DBBug.description.ilike(like))
+                    | (DBBug.id.ilike(like))
+                )
+            if status:
+                query = query.filter(DBBug.status == status)
+            if category:
+                query = query.filter(DBBug.component.ilike(f"%{category}%"))
+            rows = query.order_by(DBBug.created_at.desc()).offset(offset).limit(limit).all()
+            return [self._db_to_bug(row) for row in rows]
+
+    def list_analyses(self, limit: int = 100) -> List[Analysis]:
+        with get_db_session() as db:
+            rows = db.query(DBAnalysis).order_by(DBAnalysis.created_at.desc()).limit(limit).all()
+            return [self._db_to_analysis(row) for row in rows]
 
     @property
     def bug_count(self) -> int:

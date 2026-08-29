@@ -1579,3 +1579,223 @@ body {
   text-align: center;
 }
 
+
+/* ===== Phase 1 Analyze Bug page ===== */
+.phase1-analyze-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.phase1-connection-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+  flex-wrap: wrap;
+}
+
+.phase1-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.phase1-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.phase1-form input,
+.phase1-form textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+}
+
+.phase1-form textarea.mono,
+.phase1-json {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.phase1-form .req {
+  color: var(--accent-red);
+}
+
+.phase1-badge {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-blue);
+  font-size: 0.85rem;
+}
+
+.phase1-badge.ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+}
+
+.phase1-badge.err {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+}
+
+.phase1-error {
+  color: var(--accent-red);
+}
+
+.phase1-result-meta {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.75rem 0 1rem;
+  color: var(--text-secondary);
+}
+
+.phase1-json {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.85rem;
+  overflow: auto;
+}
+
+.phase1-kb-list {
+  margin: 1rem 0;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
+}
+
+
+/* ===== Phase 2 Analyze Bug ===== */
+.phase2-analyze-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.phase2-pipeline {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.phase2-stage {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-input);
+}
+
+.phase2-stage p {
+  margin: 0.2rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.phase2-stage-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 0.35rem;
+  background: #64748b;
+  flex-shrink: 0;
+}
+
+.phase2-stage.completed .phase2-stage-dot { background: var(--accent-green); }
+.phase2-stage.running .phase2-stage-dot { background: var(--accent-amber); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2); }
+.phase2-stage.failed .phase2-stage-dot { background: var(--accent-red); }
+
+.phase2-triage-grid,
+.phase2-log-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.phase2-metric,
+.phase2-log-grid > div {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.85rem;
+}
+
+.phase2-metric span,
+.phase2-log-grid span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.phase2-metric strong,
+.phase2-log-grid strong {
+  font-size: 1.05rem;
+  word-break: break-word;
+}
+
+.sev-critical { color: var(--accent-red); }
+.sev-high { color: #f97316; }
+.sev-medium { color: var(--accent-amber); }
+.sev-low { color: var(--accent-green); }
+
+.phase2-reason {
+  margin-top: 1rem;
+}
+
+.phase2-reason h4 {
+  margin-bottom: 0.4rem;
+}
+
+.phase2-tags {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+}
+
+
+/* Phase 3 similar bugs / knowledge / KB */
+.phase3-similar-list { display: grid; gap: 0.85rem; margin-top: 1rem; }
+.phase3-similar-item {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.9rem;
+  background: var(--bg-input);
+}
+.phase3-similar-item.dup { border-color: rgba(239, 68, 68, 0.45); }
+.phase3-similar-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+.phase3-kb-page { display: flex; flex-direction: column; gap: 1.25rem; }
+.phase3-kb-search {
+  flex: 1;
+  min-width: 180px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+

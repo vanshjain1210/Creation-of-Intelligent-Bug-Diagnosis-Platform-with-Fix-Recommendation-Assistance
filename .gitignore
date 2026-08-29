@@ -38,6 +38,7 @@ logs/
 
 # Vector store & uploads
 chroma_db/
+faiss_db/
 uploads/*
 !uploads/.gitkeep
 
@@ -80,3 +81,9 @@ sentence_transformers/
 # MyPy
 .mypy_cache/
 .dmypy.json
+
+*.db
+analyze_env/
+node_modules/
+__pycache__/
+

@@ -11,6 +11,10 @@ import ActivityPanel from './components/ActivityPanel';
 
 import { useSystemStatus } from './hooks/useSystemStatus';
 import { submitBug, analyzeBug, getAnalysis } from './services/api';
+import AnalyzeBugPage from './pages/AnalyzeBugPage';
+import HistoryPage from './pages/HistoryPage';
+import KnowledgeBasePage from './pages/KnowledgeBasePage';
+import DashboardPage from './pages/DashboardPage';
 import './App.css';
 
 export default function App() {
@@ -46,7 +50,7 @@ export default function App() {
       const result = await submitBug({ content, file });
       setSubmittedBug(result.bug);
       setUiState('preview_ready');
-      setActiveView('upload'); // Stay on upload screen to show preview
+      setActiveView('analyze'); // Stay on upload screen to show preview
       setNotification('Bug report parsed successfully. Ready for AI Analysis.');
     } catch (err) {
       setUiState('error');
@@ -154,7 +158,7 @@ export default function App() {
                 <div className="card start-analysis-cta">
                   <h3>AI Smart Bug Analyzer</h3>
                   <p>Upload files or logs to scan for errors, verify duplicate matches, and recommend remediations.</p>
-                  <button className="btn btn-primary" onClick={() => setActiveView('upload')}>
+                  <button className="btn btn-primary" onClick={() => setActiveView('analyze')}>
                     Open Bug Upload Center
                   </button>
                 </div>
@@ -169,6 +173,12 @@ export default function App() {
             </div>
           </div>
         );
+
+      case 'analyze':
+        return <AnalyzeBugPage />;
+
+      case 'knowledge':
+        return <KnowledgeBasePage />;
 
       case 'upload':
         return (
@@ -262,7 +272,7 @@ export default function App() {
         );
 
       case 'history':
-        return <HistoryPanel onSelectAnalysis={handleSelectHistory} />;
+        return <HistoryPage onSelectAnalysis={handleSelectHistory} />;
 
       case 'settings':
         return <SettingsPanel />;

@@ -20,8 +20,9 @@ async def lifespan(app: FastAPI):
 
     # Initialize SQL database tables
     try:
-        from app.config.database import engine, Base
+        from app.config.database import engine, Base, ensure_sqlite_columns
         Base.metadata.create_all(bind=engine)
+        ensure_sqlite_columns()
         logger.info("SQL Database tables initialized successfully.")
     except Exception as exc:
         logger.error("Failed to initialize database tables: %s", exc)
@@ -68,6 +69,8 @@ def create_app() -> FastAPI:
 
     register_exception_handlers(app)
     app.include_router(router, prefix=settings.api_prefix, tags=["AI-Smart-Bug-Analyzer-And-Fix-Advisor"])
+    if settings.api_prefix != "/api":
+        app.include_router(router, prefix="/api", tags=["api-aliases"])
 
     @app.get("/")
     async def root():

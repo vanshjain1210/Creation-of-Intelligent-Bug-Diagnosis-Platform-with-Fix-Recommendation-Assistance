@@ -76,7 +76,7 @@ class BugService:
             tags=tags or [],
         )
         bug = Bug(
-            title=title or f"Bug Report {metadata.bug_id[:8]}",
+            title=title or "Untitled Bug Report",
             description=description or content[:500],
             raw_content=content,
             file_path=file_path,
@@ -84,6 +84,9 @@ class BugService:
             metadata=metadata,
             status=BugStatus.SUBMITTED,
         )
+        bug.metadata.bug_id = bug.id
+        if not title:
+            bug.title = f"Bug Report {bug.id[:8]}"
         return store.save_bug(bug)
 
     async def submit_from_file(
@@ -112,6 +115,29 @@ class BugService:
 
             raise NotFoundError(f"Bug {bug_id} not found.")
         return bug
+
+    def list_bugs(self, limit: int = 100, offset: int = 0, search: str = "", status: str = "", category: str = ""):
+        return store.list_bugs(limit=limit, offset=offset, search=search, status=status, category=category)
+
+    def update_knowledge_entry(
+        self,
+        bug_id: str,
+        confirmed_root_cause: Optional[str] = None,
+        applied_fix: Optional[str] = None,
+        resolution_notes: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> Bug:
+        bug = self.get_bug(bug_id)
+        if confirmed_root_cause is not None:
+            bug.metadata.root_cause = confirmed_root_cause
+        if applied_fix is not None:
+            bug.metadata.resolution = applied_fix
+        elif resolution_notes is not None:
+            bug.metadata.resolution = resolution_notes
+        if status:
+            bug.status = BugStatus(status)
+        bug.updated_at = datetime.utcnow()
+        return store.save_bug(bug)
 
     def preprocess(self, bug: Bug) -> str:
         """Clean and normalize bug content."""

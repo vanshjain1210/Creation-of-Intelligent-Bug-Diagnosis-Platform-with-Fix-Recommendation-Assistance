@@ -3,6 +3,7 @@
 from app.models import HistoryEntry
 from app.schemas import HistoryItem, HistoryResponse
 from app.services.store import store
+from app.utils.exceptions import NotFoundError
 
 
 class HistoryService:
@@ -27,3 +28,8 @@ class HistoryService:
     def get_entry(self, entry_id: str) -> HistoryEntry | None:
         entries = store.list_history(limit=1000)
         return next((entry for entry in entries if entry.id == entry_id), None)
+
+    def delete_entry(self, entry_id: str) -> None:
+        deleted = store.delete_history(entry_id)
+        if not deleted:
+            raise NotFoundError(f"History entry {entry_id} not found.")

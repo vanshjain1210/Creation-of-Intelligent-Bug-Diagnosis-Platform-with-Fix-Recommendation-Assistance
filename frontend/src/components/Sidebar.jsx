@@ -1,13 +1,15 @@
 import React from 'react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Command Center', icon: '◫' },
+  { id: 'dashboard', label: 'Dashboard', icon: '◫' },
+  { id: 'analyze', label: 'Analyze Bug', icon: '⚡' },
   { id: 'upload', label: 'Bug Upload', icon: '↑' },
+  { id: 'history', label: 'History', icon: '☰' },
+  { id: 'knowledge', label: 'Knowledge Base', icon: '◫' },
   { id: 'results', label: 'Analysis Findings', icon: '✓' },
-  { id: 'history', label: 'History Logs', icon: '☰' },
-  { id: 'analytics', label: 'Analytics Insights', icon: '📈' },
+  { id: 'analytics', label: 'Analytics', icon: '📈' },
   { id: 'health', label: 'System Health', icon: '♥' },
-  { id: 'settings', label: 'Settings Configuration', icon: '⚙' },
+  { id: 'settings', label: 'Settings', icon: '⚙' },
 ];
 
 export default function Sidebar({ activeView, onNavigate, systemStatus }) {
@@ -21,8 +23,8 @@ export default function Sidebar({ activeView, onNavigate, systemStatus }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <h1>AI-Smart-Bug-Analyzer-And-Fix-Advisor Enterprise</h1>
-        <p>AI Smart Bug Analyzer</p>
+        <h1>Smart Bug Analyzer</h1>
+        <p>Fix Advisor — Internship Project</p>
       </div>
       <nav className="sidebar-nav">
         {NAV_ITEMS.map((item) => (

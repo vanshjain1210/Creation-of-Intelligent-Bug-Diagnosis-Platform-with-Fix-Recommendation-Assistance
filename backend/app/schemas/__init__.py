@@ -16,10 +16,14 @@ __all__ = [
     "BugResponse",
     "BugSubmitRequest",
     "BugSubmitResponse",
+    "DashboardResponse",
     "ErrorResponse",
     "HealthResponse",
     "HistoryItem",
     "HistoryResponse",
+    "KnowledgeBaseItem",
+    "KnowledgeBaseResponse",
+    "KnowledgeBaseUpdateRequest",
     "LogAnalysisResult",
     "ServiceStatus",
     "SettingsResponse",
@@ -47,6 +51,7 @@ class BugResponse(BaseModel):
     id: str
     title: str
     description: str
+    raw_content: Optional[str] = None
     file_name: Optional[str] = None
     status: BugStatus
     metadata: Dict[str, Any]
@@ -109,7 +114,7 @@ class AnalyzeResponse(BaseModel):
 class HistoryItem(BaseModel):
     id: str
     bug_id: str
-    analysis_id: str
+    analysis_id: Optional[str] = None
     title: str
     priority: BugPriority
     component: str
@@ -122,6 +127,44 @@ class HistoryResponse(BaseModel):
     success: bool = True
     total: int
     items: List[HistoryItem]
+
+
+class KnowledgeBaseItem(BaseModel):
+    id: str
+    title: str
+    description: str
+    status: BugStatus
+    priority: Optional[str] = None
+    category: Optional[str] = None
+    root_cause: Optional[str] = None
+    resolution: Optional[str] = None
+    created_at: datetime
+
+
+class KnowledgeBaseResponse(BaseModel):
+    success: bool = True
+    total: int
+    items: List[KnowledgeBaseItem]
+
+
+class KnowledgeBaseUpdateRequest(BaseModel):
+    bug_id: str
+    confirmed_root_cause: Optional[str] = None
+    applied_fix: Optional[str] = None
+    resolution_notes: Optional[str] = None
+    status: Optional[str] = None
+
+
+class DashboardResponse(BaseModel):
+    total_bugs: int = 0
+    open_bugs: int = 0
+    resolved_bugs: int = 0
+    high_risk_bugs: int = 0
+    recurring_bugs: int = 0
+    duplicate_bugs: int = 0
+    severity_distribution: Dict[str, int] = Field(default_factory=dict)
+    component_counts: Dict[str, int] = Field(default_factory=dict)
+    recent_analyses: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 # --- Settings schemas ---

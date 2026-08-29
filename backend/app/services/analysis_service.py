@@ -55,7 +55,11 @@ class AnalysisService:
             )
             bug.status = BugStatus.ANALYZED
             if analysis.triage:
-                bug.metadata.priority = BugPriority(analysis.triage.get("priority", "unknown"))
+                raw_priority = str(analysis.triage.get("priority") or "unknown").lower()
+                try:
+                    bug.metadata.priority = BugPriority(raw_priority)
+                except ValueError:
+                    bug.metadata.priority = BugPriority.UNKNOWN
                 bug.metadata.component = analysis.triage.get("component", bug.metadata.component)
                 bug.metadata.tags = analysis.triage.get("tags", bug.metadata.tags)
         except Exception as exc:
@@ -90,7 +94,7 @@ class AnalysisService:
             analysis_id=analysis.id,
             title=bug.title,
             priority=bug.metadata.priority,
-            component=bug.metadata.component,
+            component=bug.metadata.component or "",
             status=analysis.status,
             summary=analysis.summary,
         )
